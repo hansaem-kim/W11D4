@@ -6,6 +6,8 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
+Todo.delete_all
+
 t1 = Todo.create(title: "workout", body: "now", done: false)
 t2 = Todo.create(title: "eat   ", body: "food", done: false)
 t3 = Todo.create(title: "drive", body: "to work", done: false)

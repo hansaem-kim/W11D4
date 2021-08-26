@@ -129,7 +129,7 @@ var removeStep = function removeStep(step) {
 /*!******************************************!*\
   !*** ./frontend/actions/todo_actions.js ***!
   \******************************************/
-/*! exports provided: RECEIVE_TODOS, RECEIVE_TODO, REMOVE_TODO, TODO_ERROR, receiveTodos, receiveTodo, removeTodo, todoError */
+/*! exports provided: RECEIVE_TODOS, RECEIVE_TODO, REMOVE_TODO, TODO_ERROR, receiveTodos, receiveTodo, removeTodo, todoError, fetchTodos */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -142,6 +142,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "receiveTodo", function() { return receiveTodo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeTodo", function() { return removeTodo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "todoError", function() { return todoError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchTodos", function() { return fetchTodos; });
+/* harmony import */ var _util_todo_api_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/todo_api_util */ "./frontend/util/todo_api_util.js");
+
 var RECEIVE_TODOS = 'RECEIVE_TODOS';
 var RECEIVE_TODO = 'RECEIVE_TODO';
 var REMOVE_TODO = 'REMOVE_TODO';
@@ -168,6 +171,13 @@ var todoError = function todoError(error) {
   return {
     type: TODO_ERROR,
     error: error
+  };
+};
+var fetchTodos = function fetchTodos() {
+  return function (dispatch) {
+    return _util_todo_api_util__WEBPACK_IMPORTED_MODULE_0__["fetchTodos"]().then(function (todos) {
+      dispatch(receiveTodos(todos));
+    });
   };
 };
 
@@ -806,13 +816,19 @@ var TodoList = /*#__PURE__*/function (_React$Component) {
 
   var _super = _createSuper(TodoList);
 
-  function TodoList() {
+  function TodoList(props) {
     _classCallCheck(this, TodoList);
 
-    return _super.apply(this, arguments);
+    return _super.call(this, props);
   }
 
   _createClass(TodoList, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      debugger;
+      this.props.fetchTodos();
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this$props = this.props,
@@ -870,6 +886,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
     receiveTodo: function receiveTodo(todo) {
       return dispatch(Object(_actions_todo_actions__WEBPACK_IMPORTED_MODULE_2__["receiveTodo"])(todo));
+    },
+    fetchTodos: function fetchTodos(todos) {
+      return dispatch(Object(_actions_todo_actions__WEBPACK_IMPORTED_MODULE_2__["receiveTodos"])(todos));
     }
   };
 };
@@ -984,6 +1003,31 @@ var TodoListItem = /*#__PURE__*/function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 /* harmony default export */ __webpack_exports__["default"] = (TodoListItem);
+
+/***/ }),
+
+/***/ "./frontend/middleware/thunk.js":
+/*!**************************************!*\
+  !*** ./frontend/middleware/thunk.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var thunk = function thunk(store) {
+  return function (next) {
+    return function (action) {
+      if (typeof action === 'function') {
+        return action(store.dispatch, store.getState);
+      }
+
+      return next(action);
+    };
+  };
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (thunk);
 
 /***/ }),
 
@@ -1128,6 +1172,7 @@ var todosReducer = function todosReducer() {
 
   switch (action.type) {
     case _actions_todo_actions__WEBPACK_IMPORTED_MODULE_0__["RECEIVE_TODOS"]:
+      debugger;
       action.todos.forEach(function (todo) {
         nextState[todo.id] = todo;
       });
@@ -1180,12 +1225,15 @@ var todosReducer = function todosReducer() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/index.js");
 /* harmony import */ var _reducers_root_reducer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../reducers/root_reducer */ "./frontend/reducers/root_reducer.js");
+/* harmony import */ var _middleware_thunk__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../middleware/thunk */ "./frontend/middleware/thunk.js");
+
 
 
 
 var configureStore = function configureStore() {
   var preloadedState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var store = Object(redux__WEBPACK_IMPORTED_MODULE_0__["createStore"])(_reducers_root_reducer__WEBPACK_IMPORTED_MODULE_1__["default"], preloadedState);
+  debugger;
+  var store = Object(redux__WEBPACK_IMPORTED_MODULE_0__["createStore"])(_reducers_root_reducer__WEBPACK_IMPORTED_MODULE_1__["default"], preloadedState, Object(redux__WEBPACK_IMPORTED_MODULE_0__["applyMiddleware"])(_middleware_thunk__WEBPACK_IMPORTED_MODULE_2__["default"]));
   store.subscribe(function () {
     localStorage.state = JSON.stringify(store.getState());
   });
@@ -1210,9 +1258,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _store_store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./store/store */ "./frontend/store/store.js");
-/* harmony import */ var _components_root__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/root */ "./frontend/components/root.jsx");
-/* harmony import */ var _util_todo_api_util__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./util/todo_api_util */ "./frontend/util/todo_api_util.js");
-/* harmony import */ var _util_todo_api_util__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_util_todo_api_util__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _actions_todo_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./actions/todo_actions */ "./frontend/actions/todo_actions.js");
+/* harmony import */ var _components_root__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/root */ "./frontend/components/root.jsx");
+/* harmony import */ var _util_todo_api_util__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./util/todo_api_util */ "./frontend/util/todo_api_util.js");
+
 
 
 
@@ -1221,10 +1270,11 @@ __webpack_require__.r(__webpack_exports__);
 document.addEventListener('DOMContentLoaded', function () {
   var preloadedState = localStorage.state ? JSON.parse(localStorage.state) : {};
   var store = Object(_store_store__WEBPACK_IMPORTED_MODULE_2__["default"])(preloadedState);
-  window.TodoApiUtil = _util_todo_api_util__WEBPACK_IMPORTED_MODULE_4__;
-  window.fetchTodos = fetchTodos;
+  window.TodoApiUtil = _util_todo_api_util__WEBPACK_IMPORTED_MODULE_5__;
+  window.store = store;
+  window.fetchTodos = _actions_todo_actions__WEBPACK_IMPORTED_MODULE_3__["fetchTodos"];
   var root = document.getElementById('content');
-  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_root__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_root__WEBPACK_IMPORTED_MODULE_4__["default"], {
     store: store
   }), root);
 });
@@ -1251,10 +1301,21 @@ function uniqueId() {
 /*!****************************************!*\
   !*** ./frontend/util/todo_api_util.js ***!
   \****************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: fetchTodos */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/quinnm/appAcademy/W11D4/ProjectToday/frontend/util/todo_api_util.js: Unexpected token (1:30)\n\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 1 |\u001b[39m \u001b[36mimport\u001b[39m { $CombineState } \u001b[36mfrom\u001b[39m redux\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m   |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 2 |\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 3 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36mconst\u001b[39m fetchTodos \u001b[33m=\u001b[39m () \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m 4 |\u001b[39m     \u001b[36mreturn\u001b[39m $\u001b[33m.\u001b[39majax({\u001b[0m\n    at Object._raise (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:798:17)\n    at Object.raiseWithData (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:791:17)\n    at Object.raise (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:752:17)\n    at Object.unexpected (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:3257:16)\n    at Object.parseImportSource (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:14252:43)\n    at Object.parseImport (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:14234:24)\n    at Object.parseStatementContent (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:12896:27)\n    at Object.parseStatement (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:12796:17)\n    at Object.parseBlockOrModuleBlockBody (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:13385:25)\n    at Object.parseBlockBody (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:13376:10)\n    at Object.parseProgram (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:12718:10)\n    at Object.parseTopLevel (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:12709:25)\n    at Object.parse (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:14449:10)\n    at parse (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/parser/lib/index.js:14501:38)\n    at parser (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/core/lib/parser/index.js:52:34)\n    at parser.next (<anonymous>)\n    at normalizeFile (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/core/lib/transformation/normalize-file.js:82:38)\n    at normalizeFile.next (<anonymous>)\n    at run (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/core/lib/transformation/index.js:29:50)\n    at run.next (<anonymous>)\n    at Function.transform (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/@babel/core/lib/transform.js:25:41)\n    at transform.next (<anonymous>)\n    at step (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/gensync/index.js:261:32)\n    at gen.next (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/gensync/index.js:273:13)\n    at async.call.value (/Users/quinnm/appAcademy/W11D4/ProjectToday/node_modules/gensync/index.js:223:11)\n    at process._tickCallback (internal/process/next_tick.js:68:7)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchTodos", function() { return fetchTodos; });
+/* harmony import */ var redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! redux */ "./node_modules/redux/es/index.js");
+
+var fetchTodos = function fetchTodos() {
+  debugger;
+  return $.ajax({
+    url: '/api/todos',
+    method: "GET"
+  });
+};
 
 /***/ }),
 
